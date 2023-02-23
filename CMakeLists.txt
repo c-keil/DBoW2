@@ -17,6 +17,10 @@ else()
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+# # for cnpy
+find_library(LIBCNPY libcnpy.so)
+message(LIBCNPY="${LIBCNPY}")
+
 set(HDRS
   include/DBoW2/BowVector.h           
   include/DBoW2/FBrief.h
@@ -28,7 +32,8 @@ set(HDRS
   include/DBoW2/FeatureVector.h
   include/DBoW2/ScoringObject.h       
   include/DBoW2/TemplatedVocabulary.h
-  include/DBoW2/FIR.h)
+  include/DBoW2/FIR.h
+  include/DBoW2/read_ir.h)
 set(SRCS 
   src/BowVector.cpp     
   src/FBrief.cpp        
@@ -36,7 +41,8 @@ set(SRCS
   src/FIR.cpp
   src/FeatureVector.cpp 
   src/QueryResults.cpp  
-  src/ScoringObject.cpp)
+  src/ScoringObject.cpp
+  src/read_ir.cpp)
 
 set(DEPENDENCY_DIR ${CMAKE_CURRENT_BINARY_DIR}/dependencies)
 set(DEPENDENCY_INSTALL_DIR ${DEPENDENCY_DIR}/install)
@@ -51,7 +57,7 @@ if(BUILD_DBoW2)
   endif(WIN32)
   add_library(${PROJECT_NAME} ${LIB_SHARED} ${SRCS})
   target_include_directories(${PROJECT_NAME} PUBLIC include/DBoW2/ include/)
-  target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
+  target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${LIBCNPY}) #mod for libcnpy
   set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 11)
 endif(BUILD_DBoW2)
 
@@ -59,6 +65,11 @@ if(BUILD_Demo)
   add_executable(demo demo/demo.cpp)
   target_link_libraries(demo ${PROJECT_NAME} ${OpenCV_LIBS})
   set_target_properties(demo PROPERTIES CXX_STANDARD 11)
+  file(COPY demo/images DESTINATION ${CMAKE_BINARY_DIR}/)
+
+  add_executable(ir_demo demo/ir_demo.cpp)
+  target_link_libraries(ir_demo ${PROJECT_NAME} ${OpenCV_LIBS} ${LIBCNPY})
+  set_target_properties(ir_demo PROPERTIES CXX_STANDARD 11)
   file(COPY demo/images DESTINATION ${CMAKE_BINARY_DIR}/)
 endif(BUILD_Demo)
 
