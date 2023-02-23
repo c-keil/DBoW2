@@ -70,8 +70,13 @@ if(BUILD_Demo)
   add_executable(ir_demo demo/ir_demo.cpp)
   target_link_libraries(ir_demo ${PROJECT_NAME} ${OpenCV_LIBS} ${LIBCNPY})
   set_target_properties(ir_demo PROPERTIES CXX_STANDARD 11)
-  file(COPY demo/images DESTINATION ${CMAKE_BINARY_DIR}/)
-endif(BUILD_Demo)
+  # file(COPY demo/images DESTINATION ${CMAKE_BINARY_DIR}/)
+  endif(BUILD_Demo)
+  
+add_executable(build_ir_voc scripts/build_ir_voc.cpp)
+target_link_libraries(build_ir_voc ${PROJECT_NAME} ${OpenCV_LIBS} ${LIBCNPY})
+set_target_properties(build_ir_voc PROPERTIES CXX_STANDARD 11)
+
 
 configure_file(src/DBoW2.cmake.in
   "${PROJECT_BINARY_DIR}/DBoW2Config.cmake" @ONLY)
@@ -85,4 +90,6 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/DBoW2Config.cmake"
 install(FILES "${PROJECT_BINARY_DIR}/DBoW2Config.cmake" 
   DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/DBoW2/)
 install(DIRECTORY ${DEPENDENCY_INSTALL_DIR}/ DESTINATION ${CMAKE_INSTALL_PREFIX} OPTIONAL)
+message(CMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
+message(PROJECT_BINARY_DIR="${PROJECT_BINARY_DIR}")
 
