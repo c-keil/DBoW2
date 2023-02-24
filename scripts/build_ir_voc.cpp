@@ -28,8 +28,8 @@ void createVocabulary(const vector<vector<cv::Mat>> &features, const string voca
 // scoringType: 1
 // weightingType: 0
 // branching factor and depth levels
-const int k = 9;
-const int L = 3;
+const int k = 10;
+const int L = 6;
 const WeightingType weight = TF_IDF;
 const ScoringType scoring = L2_NORM;
 
@@ -57,7 +57,8 @@ int main(int argc, char **argv)
 void loadFeatures(const vector<string>& fnames, vector<vector<cv::Mat>> &features)
 {
     for (string fname : fnames)
-    {
+    {   
+        cout << "processing file " << fname << endl;
         cv::Mat desc;
         features.push_back(vector<cv::Mat>());
         readDescNPY(fname, desc);
@@ -97,9 +98,33 @@ void getDescFileNames(const string strPathsFile, vector<string> &vstrDescFiles)
 }
 
 void createVocabulary(const vector<vector<cv::Mat>> &features, const string vocabName)
-{    
+{   
+    cout << "creating vocabulary" << endl;
     IRVocabulary voc(k, L, weight, scoring);
     voc.create(features);
+
+    cout << "testing vocabulary " << endl;
+    BowVector v1, v2;
+    for (uint i = 0; i < features.size(); i++)
+    {
+        voc.transform(features[i], v1);
+        voc.transform(features[i], v2);
+        double score = voc.score(v1, v2);
+        cout << "Image " << i << " vs Image " << i << ": " << score << endl;
+
+        // for (uint j = 0; j < features.size(); j++)
+        // {
+        //     voc.transform(features[j], v2);
+
+        //     double score = voc.score(v1, v2);
+        //     if (score > 0.0)
+        //     {
+        //         // cout << "SOCRE" << endl;
+        //         cout << "Image " << i << " vs Image " << j << ": " << score << endl;
+        //     }
+        // }
+    }
+
     cout << endl << "Saving vocabulary..." << endl;
     voc.save(vocabName + ".yml.gz");
     cout << "Done" << endl;

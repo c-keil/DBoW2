@@ -152,6 +152,22 @@ void testVocCreation(const vector<vector<cv::Mat>> &features)
   cout << endl << "Saving vocabulary..." << endl;
   voc.save("small_voc.yml.gz");
   cout << "Done" << endl;
+
+  voc.load("small_voc.yml.gz");
+  // lets do something with this vocabulary
+  cout << "Matching images against themselves (0 low, 1 high): " << endl;
+  // BowVector v1, v2;
+  for (int i = 0; i < NIMAGES; i++)
+  {
+    voc.transform(features[i], v1);
+    for (int j = 0; j < NIMAGES; j++)
+    {
+      voc.transform(features[j], v2);
+
+      double score = voc.score(v1, v2);
+      cout << "Image " << i << " vs Image " << j << ": " << score << endl;
+    }
+  }
 }
 
 // ----------------------------------------------------------------------------

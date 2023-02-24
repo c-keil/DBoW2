@@ -72,10 +72,13 @@ if(BUILD_Demo)
   set_target_properties(ir_demo PROPERTIES CXX_STANDARD 11)
   # file(COPY demo/images DESTINATION ${CMAKE_BINARY_DIR}/)
   endif(BUILD_Demo)
-  
+#IR experiment
 add_executable(build_ir_voc scripts/build_ir_voc.cpp)
 target_link_libraries(build_ir_voc ${PROJECT_NAME} ${OpenCV_LIBS} ${LIBCNPY})
 set_target_properties(build_ir_voc PROPERTIES CXX_STANDARD 11)
+add_executable(test_ir_voc scripts/test_ir_temporal_gap_voc.cpp)
+target_link_libraries(test_ir_voc ${PROJECT_NAME} ${OpenCV_LIBS} ${LIBCNPY})
+set_target_properties(test_ir_voc PROPERTIES CXX_STANDARD 11)
 
 
 configure_file(src/DBoW2.cmake.in
