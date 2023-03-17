@@ -15,19 +15,19 @@
 using namespace DBoW2;
 using namespace std;
 
-void loadFeatures(const vector<string> &fnames, vector<vector<cv::Mat>> &features);
-void changeStructure(const cv::Mat &plain, vector<cv::Mat> &out);
-void testVocCreation(const vector<vector<cv::Mat > > &features);
-void testDatabase(const vector<vector<cv::Mat > > &features);
+void loadFeatures(const vector<string> &fnames, vector<vector<vector<float>>> &features);
+void changeStructure(const cv::Mat &plain, vector<vector<float>> &out);
+void testVocCreation(const vector<vector<vector<float> > > &features);
+void testDatabase(const vector<vector<vector<float> > > &features);
 void getDescFileNames(const string strPathsFile, vector<string> &vstrDesc);
-void createVocabulary(const vector<vector<cv::Mat>> &features, const string vocabName);
+void createVocabulary(const vector<vector<vector<float>>> &features, const string vocabName);
+// void loadFeatures(const vector<string> &fnames, vector<vector<cv::Mat>> &features);
+// void changeStructure(const cv::Mat &plain, vector<cv::Mat> &out);
+// void testVocCreation(const vector<vector<cv::Mat>> &features);
+// void testDatabase(const vector<vector<cv::Mat>> &features);
+// void getDescFileNames(const string strPathsFile, vector<string> &vstrDesc);
+// void createVocabulary(const vector<vector<cv::Mat>> &features, const string vocabName);
 
-// const string desc_index_file = "";
-// k: 10
-// L: 6
-// scoringType: 1
-// weightingType: 0
-// branching factor and depth levels
 const int k = 10;
 const int L = 6;
 const WeightingType weight = TF_IDF;
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
     vector<string> fileNames;
     getDescFileNames(desc_index_file, fileNames);
 
-    vector<vector<cv::Mat>> features;
+    vector<vector<vector<float>>> features;
     loadFeatures(fileNames, features);
 
     createVocabulary(features, save_path);
@@ -54,27 +54,31 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void loadFeatures(const vector<string>& fnames, vector<vector<cv::Mat>> &features)
+void loadFeatures(const vector<string>& fnames, vector<vector<vector<float>>> &features)
 {
+    uint lim = 300;
     for (string fname : fnames)
     {   
         cout << "processing file " << fname << endl;
-        cv::Mat desc;
-        features.push_back(vector<cv::Mat>());
+        vector<vector<float>> desc;
         readDescNPY(fname, desc);
-        changeStructure(desc, features.back());
+        if (desc.size() > lim)
+        {
+            desc.resize(lim);
+        }
+        features.push_back(desc);
     }
 }
 
-void changeStructure(const cv::Mat &plain, vector<cv::Mat> &out)
-{
-  out.resize(plain.rows);
+// void changeStructure(const cv::Mat &plain, vector<cv::Mat> &out)
+// {
+//   out.resize(plain.rows);
 
-  for(int i = 0; i < plain.rows; ++i)
-  {
-    out[i] = plain.row(i);
-  }
-}
+//   for(int i = 0; i < plain.rows; ++i)
+//   {
+//     out[i] = plain.row(i);
+//   }
+// }
 
 void getDescFileNames(const string strPathsFile, vector<string> &vstrDescFiles)
 {
@@ -97,11 +101,14 @@ void getDescFileNames(const string strPathsFile, vector<string> &vstrDescFiles)
     }
 }
 
-void createVocabulary(const vector<vector<cv::Mat>> &features, const string vocabName)
+void createVocabulary(const vector<vector<vector<float>>> &features, const string vocabName)
 {   
     cout << "creating vocabulary" << endl;
-    IRVocabulary voc(k, L, weight, scoring);
+    IRVocabulary2 voc(k, L, weight, scoring);
     voc.create(features);
+    cout << voc << endl;
+    cout << endl << "Saving vocabulary..." << endl;
+    voc.save(vocabName + ".yml.gz");
 
     cout << "testing vocabulary " << endl;
     BowVector v1, v2;
@@ -110,7 +117,11 @@ void createVocabulary(const vector<vector<cv::Mat>> &features, const string voca
         voc.transform(features[i], v1);
         voc.transform(features[i], v2);
         double score = voc.score(v1, v2);
-        cout << "Image " << i << " vs Image " << i << ": " << score << endl;
+        if (score < 0.0001)
+        {
+            // cout << "vector: " << v1 << " vector 2: " << v2 << endl;
+            cout << "Image " << i << " vs Image " << i << ": " << score << endl;
+        }
 
         // for (uint j = 0; j < features.size(); j++)
         // {
@@ -127,5 +138,5 @@ void createVocabulary(const vector<vector<cv::Mat>> &features, const string voca
 
     cout << endl << "Saving vocabulary..." << endl;
     voc.save(vocabName + ".yml.gz");
-    cout << "Done" << endl;
+    // cout << "Done" << endl;
 }

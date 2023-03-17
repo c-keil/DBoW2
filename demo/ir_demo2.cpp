@@ -16,12 +16,10 @@ using namespace DBoW2;
 using namespace std;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-void loadFeatures(vector<vector<cv::Mat > > &features);
-void changeStructure(const cv::Mat &plain, vector<cv::Mat> &out);
-void testVocCreation(const vector<vector<cv::Mat > > &features);
-void testDatabase(const vector<vector<cv::Mat > > &features);
-
+void loadFeatures(vector<vector<vector<float> > > &features);
+// void changeStructure(const cv::Mat &plain, vector<cv::Mat> &out);
+void testVocCreation(const vector<vector<vector<float>>> &features);
+void testDatabase(const vector<vector<vector<float>>> &features);
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -45,7 +43,7 @@ void wait()
 
 int main()
 {
-  vector<vector<cv::Mat > > features;
+  vector<vector<vector<float> > > features;
   loadFeatures(features);
 
   testVocCreation(features);
@@ -59,7 +57,7 @@ int main()
 
 // ----------------------------------------------------------------------------
 
-void loadFeatures(vector<vector<cv::Mat>> &features)
+void loadFeatures(vector<vector<vector<float>>> &features)
 {
   features.clear();
   features.reserve(NIMAGES);
@@ -67,47 +65,49 @@ void loadFeatures(vector<vector<cv::Mat>> &features)
   // cv::Ptr<cv::ORB> orb = cv::ORB::create();
 
   cout << "Extracting IR features..." << endl;
-  cv::Mat desc;
+  cv::Mat desc_m;
+  vector<vector<float>> desc;
 
-  features.push_back(vector<cv::Mat>());
+  // readDescNPY(dir + desc1, desc_m);
   readDescNPY(dir + desc1, desc);
-  changeStructure(desc, features.back());
+  features.push_back(desc);
+  readDescNPY(dir + desc2, desc);
+  features.push_back(desc);
+  readDescNPY(dir + desc3, desc);
+  features.push_back(desc);
+  readDescNPY(dir + desc4, desc);
+  features.push_back(desc);
+
+  // cout << desc.size() << endl;
+  // cout << desc[0].size() << endl;
+  // for (uint i = 0; i < 256; i++)
+  // {
+  //   cout << desc[0][i] ;
+  // }
+
+
+  // changeStructure(desc, features.back());
   // cout << features.back().size() << endl;
   // cout << features[0][0] << endl;
 
-  features.push_back(vector<cv::Mat>());
-  readDescNPY(dir + desc2, desc);
-  changeStructure(desc, features.back());
-  // cout << features.back().size() << endl;
-  // cout << features[0][0] - features[1][0] << endl;
+  // features.push_back(vector<vector<float>>());
+  // readDescNPY(dir + desc2, desc);
+  // // changeStructure(desc, features.back());
+  // // cout << features.back().size() << endl;
+  // // cout << features[0][0] - features[1][0] << endl;
 
-  features.push_back(vector<cv::Mat>());
-  readDescNPY(dir + desc3, desc);
-  changeStructure(desc, features.back());
-  // cout << features.back().size() << endl;
-  // cout << desc.row(0) << endl;
+  // features.push_back(vector<vector<float>>());
+  // readDescNPY(dir + desc3, desc);
+  // // changeStructure(desc, features.back());
+  // // cout << features.back().size() << endl;
+  // // cout << desc.row(0) << endl;
 
-  features.push_back(vector<cv::Mat>());
-  readDescNPY(dir + desc4, desc);
-  changeStructure(desc, features.back());
-  // cout << features.back().size() << endl;
-  // cout << desc.row(0) << endl;
+  // features.push_back(vector<vector<float>>());
+  // readDescNPY(dir + desc4, desc);
+  // // changeStructure(desc, features.back());
+  // // cout << features.back().size() << endl;
+  // // cout << desc.row(0) << endl;
 
-  // for(int i = 0; i < NIMAGES; ++i)
-  // {
-  //   stringstream ss;
-  //   ss << "images/image" << i << ".png";
-
-  //   cv::Mat image = cv::imread(ss.str(), 0);
-  //   cv::Mat mask;
-  //   vector<cv::KeyPoint> keypoints;
-  //   cv::Mat descriptors;
-
-  //   orb->detectAndCompute(image, mask, keypoints, descriptors);
-
-  //   features.push_back(vector<cv::Mat >());
-  //   changeStructure(descriptors, features.back());
-  // }
 }
 
 // ----------------------------------------------------------------------------
@@ -124,7 +124,7 @@ void changeStructure(const cv::Mat &plain, vector<cv::Mat> &out)
 
 // ----------------------------------------------------------------------------
 
-void testVocCreation(const vector<vector<cv::Mat>> &features)
+void testVocCreation(const vector<vector<vector<float>>> &features)
 {
   // branching factor and depth levels 
   const int k = 9;
@@ -132,7 +132,7 @@ void testVocCreation(const vector<vector<cv::Mat>> &features)
   const WeightingType weight = TF_IDF;
   const ScoringType scoring = L2_NORM;
 
-  IRVocabulary voc(k, L, weight, scoring);
+  IRVocabulary2 voc(k, L, weight, scoring);
 
   cout << "Creating a small " << k << "^" << L << " vocabulary..." << endl;
   voc.create(features);
@@ -158,10 +158,10 @@ void testVocCreation(const vector<vector<cv::Mat>> &features)
 
   // save the vocabulary to disk
   cout << endl << "Saving vocabulary..." << endl;
-  voc.save("small_voc.yml.gz");
+  voc.save("small_voc2.yml.gz");
   cout << "Done" << endl;
 
-  voc.load("small_voc.yml.gz");
+  voc.load("small_voc2.yml.gz");
   // lets do something with this vocabulary
   cout << "Matching images against themselves (0 low, 1 high): " << endl;
   // BowVector v1, v2;
@@ -181,14 +181,14 @@ void testVocCreation(const vector<vector<cv::Mat>> &features)
 
 // ----------------------------------------------------------------------------
 
-void testDatabase(const vector<vector<cv::Mat>> &features)
+void testDatabase(const vector<vector<vector<float>>> &features)
 {
   cout << "Creating a small database..." << endl;
 
   // load the vocabulary from disk
-  IRVocabulary voc("small_voc.yml.gz");
+  IRVocabulary2 voc("small_voc2.yml.gz");
   
-  IRDatabase db(voc, false, 0); // false = do not use direct index
+  IRDatabase2 db(voc, false, 0); // false = do not use direct index
   // (so ignore the last param)
   // The direct index is useful if we want to retrieve the features that 
   // belong to some vocabulary node.
@@ -223,12 +223,12 @@ void testDatabase(const vector<vector<cv::Mat>> &features)
   // we can save the database. The created file includes the vocabulary
   // and the entries added
   cout << "Saving database..." << endl;
-  db.save("small_db.yml.gz");
+  db.save("small_db2.yml.gz");
   cout << "... done!" << endl;
   
   // once saved, we can load it again  
   cout << "Retrieving database once again..." << endl;
-  IRDatabase db2("small_db.yml.gz");
+  IRDatabase db2("small_db2.yml.gz");
   cout << "... done! This is: " << endl << db2 << endl;
 }
 
