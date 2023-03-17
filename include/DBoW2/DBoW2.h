@@ -57,6 +57,7 @@ namespace DBoW2
 #include "FBrief.h"
 #include "FORB.h"
 #include "FIR.h"
+#include "FIR2.h"
 
 /// ORB Vocabulary
 typedef DBoW2::TemplatedVocabulary<DBoW2::FORB::TDescriptor, DBoW2::FORB> 
@@ -81,6 +82,14 @@ typedef DBoW2::TemplatedVocabulary<DBoW2::FIR::TDescriptor, DBoW2::FIR>
 //superpoint IR Database
 typedef DBoW2::TemplatedDatabase<DBoW2::FIR::TDescriptor, DBoW2::FIR>
     IRDatabase;
+
+/// superpoint IR Vocabulary
+typedef DBoW2::TemplatedVocabulary<DBoW2::FIR2::TDescriptor, DBoW2::FIR2>
+    IRVocabulary2;
+
+// superpoint IR Database
+typedef DBoW2::TemplatedDatabase<DBoW2::FIR2::TDescriptor, DBoW2::FIR2>
+    IRDatabase2;
 
 #endif
 

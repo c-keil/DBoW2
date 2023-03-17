@@ -33,12 +33,14 @@ set(HDRS
   include/DBoW2/ScoringObject.h       
   include/DBoW2/TemplatedVocabulary.h
   include/DBoW2/FIR.h
+  include/DBoW2/FIR2.h
   include/DBoW2/read_ir.h)
 set(SRCS 
   src/BowVector.cpp     
   src/FBrief.cpp        
   src/FORB.cpp
   src/FIR.cpp
+  src/FIR2.cpp
   src/FeatureVector.cpp 
   src/QueryResults.cpp  
   src/ScoringObject.cpp
@@ -70,15 +72,23 @@ if(BUILD_Demo)
   add_executable(ir_demo demo/ir_demo.cpp)
   target_link_libraries(ir_demo ${PROJECT_NAME} ${OpenCV_LIBS} ${LIBCNPY})
   set_target_properties(ir_demo PROPERTIES CXX_STANDARD 11)
+  add_executable(ir_demo2 demo/ir_demo2.cpp)
+  target_link_libraries(ir_demo2 ${PROJECT_NAME} ${OpenCV_LIBS} ${LIBCNPY})
+  set_target_properties(ir_demo2 PROPERTIES CXX_STANDARD 11)
   # file(COPY demo/images DESTINATION ${CMAKE_BINARY_DIR}/)
   endif(BUILD_Demo)
 #IR experiment
 add_executable(build_ir_voc scripts/build_ir_voc.cpp)
 target_link_libraries(build_ir_voc ${PROJECT_NAME} ${OpenCV_LIBS} ${LIBCNPY})
 set_target_properties(build_ir_voc PROPERTIES CXX_STANDARD 11)
-add_executable(test_ir_voc scripts/test_ir_temporal_gap_voc.cpp)
-target_link_libraries(test_ir_voc ${PROJECT_NAME} ${OpenCV_LIBS} ${LIBCNPY})
-set_target_properties(test_ir_voc PROPERTIES CXX_STANDARD 11)
+
+add_executable(corss_test_voc scripts/test_ir_voc.cpp)
+target_link_libraries(corss_test_voc ${PROJECT_NAME} ${OpenCV_LIBS} ${LIBCNPY})
+set_target_properties(corss_test_voc PROPERTIES CXX_STANDARD 11)
+
+add_executable(test_ir_voc_tg scripts/test_ir_temporal_gap_voc.cpp)
+target_link_libraries(test_ir_voc_tg ${PROJECT_NAME} ${OpenCV_LIBS} ${LIBCNPY})
+set_target_properties(test_ir_voc_tg PROPERTIES CXX_STANDARD 11)
 
 
 configure_file(src/DBoW2.cmake.in
