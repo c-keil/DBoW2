@@ -90,6 +90,10 @@ add_executable(test_ir_voc_tg scripts/test_ir_temporal_gap_voc.cpp)
 target_link_libraries(test_ir_voc_tg ${PROJECT_NAME} ${OpenCV_LIBS} ${LIBCNPY})
 set_target_properties(test_ir_voc_tg PROPERTIES CXX_STANDARD 11)
 
+add_executable(simple_ir_test scripts/simple_ir_test.cpp)
+target_link_libraries(simple_ir_test ${PROJECT_NAME} ${OpenCV_LIBS} ${LIBCNPY})
+set_target_properties(simple_ir_test PROPERTIES CXX_STANDARD 11)
+
 
 configure_file(src/DBoW2.cmake.in
   "${PROJECT_BINARY_DIR}/DBoW2Config.cmake" @ONLY)
