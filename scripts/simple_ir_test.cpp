@@ -65,7 +65,7 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void readFeatures(const string &fname, vector<vector<float>> &features, const uint lim = 300)
+void readFeatures(const string &fname, vector<vector<float>> &features, const uint lim)
 {
     /*reads 1 descriptor file*/
     readDescNPY(fname, features);
@@ -80,9 +80,9 @@ void loadFeatures(const vector<string> &fnames, vector<vector<vector<float>>> &f
     uint lim = 300;
     for (string fname : fnames)
     {
-        // cout << "processing file " << fname << endl;
+        cout << "processing file " << fname << endl;
         vector<vector<float>> descriptors;
-        readFeatures(fname, descriptors); 
+        readFeatures(fname, descriptors, lim); 
         features.push_back(descriptors);
     }
 }
@@ -106,6 +106,7 @@ void getDescFileNames(const string strPathsFile, vector<string> &vstrDescFiles)
             vstrDescFiles.push_back(ss.str());
         }
     }
+    cout << "Found " << vstrDescFiles.size() << " descriptor files" << endl;
 }
 
 // void createVocabulary(const vector<vector<vector<float>>> &features, const string vocabName)
@@ -157,6 +158,9 @@ const string voc_file, const string out_file)
     //     file << res << "\n";
 
     // }
+    cout << "Searching for image " << endl;
+    cout << res << endl;
+    file << res << "\n";
     file.close();
 
     // BowVector v1, v2;
