@@ -54,6 +54,7 @@ int main(int argc, char **argv)
     // loadFeatures(fileNames1, features1);
 
     loadFeatures(fileNames, features2);
+    readFeatures(desc_file_name, features, 300);
 
     //test vacabulary
     testVoc(features, features2, voc_file, out_file);
@@ -131,11 +132,11 @@ const string voc_file, const string out_file)
     cout << "voc : " << voc << endl;
     IRDatabase2 db(voc, false, 0);
     //add features to db
-    BowVector v1;
+    BowVector v1, v2;
     for (uint i = 0; i < features2.size(); i++)
     {
         // cout << "loading features " << i << endl;
-        // voc.transform(features1[i], v1);
+        // voc.transform(features2[i], v1);
         // cout << "Vector : " << v1 << endl;
         db.add(features2[i]);
     }
@@ -162,6 +163,12 @@ const string voc_file, const string out_file)
     cout << res << endl;
     file << res << "\n";
     file.close();
+
+    voc.transform(features2[2], v1);
+    voc.transform(features, v2);
+    // cout << "v2" << endl;
+    // cout << v2 << endl;
+    cout << "Self score :" << voc.score(v1, v2) << endl;
 
     // BowVector v1, v2;
     // for (uint i = 0; i < features.size(); i++)
