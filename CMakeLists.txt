@@ -104,6 +104,9 @@ add_executable(simple_ir_test scripts/simple_ir_test.cpp)
 target_link_libraries(simple_ir_test ${PROJECT_NAME} ${OpenCV_LIBS} ${LIBCNPY})
 set_target_properties(simple_ir_test PROPERTIES CXX_STANDARD 11)
 
+add_executable(ir_db_experiment scripts/ir_db_experiment.cpp)
+target_link_libraries(ir_db_experiment ${PROJECT_NAME} ${OpenCV_LIBS} ${LIBCNPY})
+set_target_properties(ir_db_experiment PROPERTIES CXX_STANDARD 11)
 
 configure_file(src/DBoW2.cmake.in
   "${PROJECT_BINARY_DIR}/DBoW2Config.cmake" @ONLY)
