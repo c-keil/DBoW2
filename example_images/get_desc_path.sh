@@ -9,5 +9,6 @@ rm -f $2
 for p in ${paths[@]}
 do
 fname=$(basename $p)
-echo $(dirname $p)/sp_v6/descriptors/${fname/.png/.npy} >> $2
+echo $(dirname $p)/irpoint_v5/descriptors/${fname/.png/.npy} >> $2
+# echo $(dirname $p)/sp_v6/descriptors/${fname/.png/.npy} >> $2
 done
