@@ -23,8 +23,8 @@ void getDescFileNames(const string strPathsFile, vector<string> &vstrDesc);
 void createVocabulary(const vector<vector<vector<float>>> &features, const string vocabName);
 // void testVoc(vector<vector<float>> &features, vector<vector<vector<float>>> &features2,
 //              const string voc_file, const string out_file, const string db_file, const string test_file);
-void testVoc(vector<vector<float>> &features, vector<vector<vector<float>>> &features2,
-             const string voc_file, const string out_file);
+void testVoc(vector<vector<vector<float>>> &features1, vector<vector<vector<float>>> &features2,
+             const string voc_file, const string out_file, const uint n_results = 1);
 
 // const int k = 10;
 // const int L = 6;
@@ -34,30 +34,34 @@ void testVoc(vector<vector<float>> &features, vector<vector<vector<float>>> &fea
 int main(int argc, char **argv)
 {
 
-    if(argc != 5)
+    if(argc != 6)
     {
         cerr << endl
-             << "Usage: test_ir_voc <querry_image_descriptors> <paths_file> <vocab_file> <output_file>" << endl;
+             << "Usage: test_ir_voc <querry_image_descriptors> <paths_file> <vocab_file> <output_file> <n-results>" << endl;
         return 1;
     }
-    string desc_file_name = string(argv[1]);
+    string querry_index_file = string(argv[1]);
     string desc_index_file = string(argv[2]);
     string voc_file = string(argv[3]);
     string out_file = string(argv[4]);
-    vector<string> fileNames;
+    uint n_results = stoi(argv[5]);
+    vector<string> querry_file_names;
+    vector<string> descriptor_file_names;
     // getDescFileNames(desc_index_file1, fileNames1);
-    getDescFileNames(desc_index_file, fileNames);
+    getDescFileNames(desc_index_file, descriptor_file_names);
+    getDescFileNames(querry_index_file, querry_file_names);
 
-    vector<vector<float>> features;
+    vector<vector<vector<float>>> features;
     vector<vector<vector<float>>> features2;
 
     // loadFeatures(fileNames1, features1);
 
-    loadFeatures(fileNames, features2);
-    readFeatures(desc_file_name, features, 300);
+    loadFeatures(querry_file_names, features);
+    loadFeatures(descriptor_file_names, features2);
+    // readFeatures(desc_file_name, features, 300);
 
     //test vacabulary
-    testVoc(features, features2, voc_file, out_file);
+    testVoc(features, features2, voc_file, out_file, n_results);
     // testVoc(features, features2, voc_file, out_file, desc_index_file);
 
     //write results to file
@@ -122,8 +126,8 @@ void getDescFileNames(const string strPathsFile, vector<string> &vstrDescFiles)
 
 // void testVoc(vector<vector<float>> &features, vector<vector<vector<float>>> &features2, 
 // const string voc_file, const string out_file, const string db_file, const string test_file)
-void testVoc(vector<vector<float>> &features, vector<vector<vector<float>>> &features2, 
-const string voc_file, const string out_file)
+void testVoc(vector<vector<vector<float>>> &features, vector<vector<vector<float>>> &features2, 
+const string voc_file, const string out_file, const uint n_results)
 {
 
     // load vocabulary
@@ -134,15 +138,15 @@ const string voc_file, const string out_file)
     //add features to db
     BowVector v1, v2;
     // voc.transform(features2[2], v1);
-    voc.transform(features, v2);
+    // voc.transform(features, v2);
     // cout << "v2" << endl;
     // cout << v2 << endl;
 
     for (uint i = 0; i < features2.size(); i++)
     {
-        cout << "loading features " << i << endl;
-        voc.transform(features2[i], v1);
-        cout << "Compare :" << voc.score(v1, v2) << endl;
+        // cout << "loading features " << i << endl;
+        // voc.transform(features2[i], v1);
+        // cout << "Compare :" << voc.score(v1, v2) << endl;
         // cout << "Vector : " << v1 << endl;
         db.add(features2[i]);
     }
@@ -150,30 +154,30 @@ const string voc_file, const string out_file)
     // cout << "Testing feature set 2 against feature set 1" << endl;
 
     ofstream file;
-    file.open(out_file);
     // file << db_file << "\n" << test_file <<  "\n"; 
 
-    QueryResults res;
-    db.query(features, res, 3);
-    // for (uint i = 0; i < features2.size(); i++)
-    // {
-    //     // voc.transform(features2[i], v1);
-    //     // cout << "Vector : " << v1 << endl;
-    //     db.query(features2[i], res, 2);
-    //     cout << "Searching for Image " << i << ". " << res << endl;
-    //     file << "Test Im: " << i << "\n";
-    //     file << res << "\n";
-
-    // }
     cout << "Searching for image " << endl;
-    cout << res << endl;
+    // cout << res << endl;
+    QueryResults res;
+    // db.query(features, res, n_results);
+    for (uint i = 0; i < features.size(); i++)
+    {
+        db.query(features[i], res, n_results);
+        // voc.transform(features2[i], v1);
+        // cout << "Vector : " << v1 << endl;
+        // cout << "Searching for Image " << i << ". " << res << endl;
+        // file << "Test Im: " << i << "\n";
+        // file << res << "\n";
+        file.open(out_file + to_string(i));
+        for (uint j=0; j < res.size(); j++)
+        {
+            file << res[j].Id << ", " << res[j].Score << '\n';
+        }
+        file.close();
+
+    }
 
     // file << res << "\n";
-    for (uint i=0; i < res.size(); i++)
-    {
-        file << res[i].Id << ", " << res[i].Score << '\n';
-    }
-    file.close();
 
     // voc.transform(features2[2], v1);
     // voc.transform(features, v2);
