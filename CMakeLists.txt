@@ -49,7 +49,17 @@ set(SRCS
 set(DEPENDENCY_DIR ${CMAKE_CURRENT_BINARY_DIR}/dependencies)
 set(DEPENDENCY_INSTALL_DIR ${DEPENDENCY_DIR}/install)
 
-find_package(OpenCV REQUIRED)
+
+# if(DEFINED ENV{OPENCV_INSTALL_DIR})
+#     find_package(OpenCV 3.2 REQUIRED PATHS $ENV{OPENCV_INSTALL_DIR})
+# else()
+#     message("OPENCV_INSTALL_DIR not set, searching in default location(s)")
+#     # find_package(OpenCV 3.2 REQUIRED)
+#     find_package(OpenCV REQUIRED)
+# endif(DEFINED ENV{OPENCV_INSTALL_DIR})
+
+# find_package(OpenCV REQUIRED)
+find_package(OpenCV 3.4 REQUIRED PATHS /home/colin/Software/opencv-3.4.16/build/install)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 if(BUILD_DBoW2)
