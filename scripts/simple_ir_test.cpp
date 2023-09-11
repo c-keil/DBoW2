@@ -133,10 +133,16 @@ const string voc_file, const string out_file)
     IRDatabase2 db(voc, false, 0);
     //add features to db
     BowVector v1, v2;
+    // voc.transform(features2[2], v1);
+    voc.transform(features, v2);
+    // cout << "v2" << endl;
+    // cout << v2 << endl;
+
     for (uint i = 0; i < features2.size(); i++)
     {
-        // cout << "loading features " << i << endl;
-        // voc.transform(features2[i], v1);
+        cout << "loading features " << i << endl;
+        voc.transform(features2[i], v1);
+        cout << "Compare :" << voc.score(v1, v2) << endl;
         // cout << "Vector : " << v1 << endl;
         db.add(features2[i]);
     }
@@ -148,7 +154,7 @@ const string voc_file, const string out_file)
     // file << db_file << "\n" << test_file <<  "\n"; 
 
     QueryResults res;
-    db.query(features, res, 1);
+    db.query(features, res, 3);
     // for (uint i = 0; i < features2.size(); i++)
     // {
     //     // voc.transform(features2[i], v1);
@@ -161,14 +167,19 @@ const string voc_file, const string out_file)
     // }
     cout << "Searching for image " << endl;
     cout << res << endl;
-    file << res << "\n";
+
+    // file << res << "\n";
+    for (uint i=0; i < res.size(); i++)
+    {
+        file << res[i].Id << ", " << res[i].Score << '\n';
+    }
     file.close();
 
-    voc.transform(features2[2], v1);
-    voc.transform(features, v2);
-    // cout << "v2" << endl;
-    // cout << v2 << endl;
-    cout << "Self score :" << voc.score(v1, v2) << endl;
+    // voc.transform(features2[2], v1);
+    // voc.transform(features, v2);
+    // // cout << "v2" << endl;
+    // // cout << v2 << endl;
+    // cout << "Self score :" << voc.score(v1, v2) << endl;
 
     // BowVector v1, v2;
     // for (uint i = 0; i < features.size(); i++)
