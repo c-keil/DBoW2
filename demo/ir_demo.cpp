@@ -27,11 +27,11 @@ void testDatabase(const vector<vector<cv::Mat > > &features);
 
 // number of training images
 const int NIMAGES = 4;
-const string dir = "/media/colin/DATA/IR_Data/blob_sculpture1/images/clahe/descriptors/";
-const string desc1 = "1676148658926000118_desc.npy";
-const string desc2 = "1676148666526000023_desc.npy";
-const string desc3 = "1676148670426000118_desc.npy";
-const string desc4 = "1676148683059000015_desc.npy";
+const string dir = "/media/colin/box_data/ir_data/nuance_data/columbus_garrage_day_night/garrage_roof_nuance_jul14_7pm/cam_3/matlab_clahe2/sp_v6/descriptors/";
+const string desc1 = "1689377359915999889.npy";
+const string desc2 = "1689377362282999992.npy";
+const string desc3 = "1689377385584000111.npy";
+const string desc4 = "1689377395049999952.npy";
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

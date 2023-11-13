@@ -37,7 +37,7 @@ int main(int argc, char **argv)
     if(argc != 6)
     {
         cerr << endl
-             << "Usage: test_ir_voc <querry_image_descriptors> <paths_file> <vocab_file> <output_file> <n-results>" << endl;
+             << "Usage: ir_db_experiment <querry_desc_paths_file> <paths_file> <vocab_file> <output_file> <n-results>" << endl;
         return 1;
     }
     string querry_index_file = string(argv[1]);
