@@ -64,10 +64,10 @@ void loadFeatures(const vector<string>& fnames, vector<vector<vector<float>>> &f
         cout << "processing file " << fname << endl;
         vector<vector<float>> desc;
         readDescNPY(fname, desc);
-        if (desc.size() > lim)
-        {
-            desc.resize(lim);
-        }
+        // if (desc.size() > lim)
+        // {
+        //     desc.resize(lim);
+        // }
         features.push_back(desc);
     }
 }

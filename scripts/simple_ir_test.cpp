@@ -78,7 +78,7 @@ void readFeatures(const string &fname, vector<vector<float>> &features, const ui
 
 void loadFeatures(const vector<string> &fnames, vector<vector<vector<float>>> &features)
 {
-    uint lim = 300;
+    uint lim = 1000;
     for (string fname : fnames)
     {
         cout << "processing file " << fname << endl;
