@@ -127,14 +127,15 @@ void getDescFileNames(const string strPathsFile, vector<string> &vstrDescFiles)
 // void testVoc(vector<vector<float>> &features, vector<vector<vector<float>>> &features2, 
 // const string voc_file, const string out_file, const string db_file, const string test_file)
 void testVoc(vector<vector<vector<float>>> &features, vector<vector<vector<float>>> &features2, 
-const string voc_file, const string out_file, const uint n_results)
+    const string voc_file, const string out_file, const uint n_results)
 {
 
     // load vocabulary
     cout << "reading in voc file : " << voc_file << endl;
     IRVocabulary2 voc(voc_file);
     cout << "voc : " << voc << endl;
-    IRDatabase2 db(voc, false, 0);
+    // IRDatabase2 db(voc, false, 0);
+    IRDatabase2 db(voc, true, 1);
     //add features to db
     BowVector v1, v2;
     // voc.transform(features2[2], v1);
@@ -168,6 +169,7 @@ const string voc_file, const string out_file, const uint n_results)
         // cout << "Searching for Image " << i << ". " << res << endl;
         // file << "Test Im: " << i << "\n";
         // file << res << "\n";
+        // res[0].sumCommonVi
         file.open(out_file + to_string(i));
         for (uint j=0; j < res.size(); j++)
         {
