@@ -25,11 +25,11 @@ void testDatabase(const vector<vector<vector<float>>> &features);
 
 // number of training images
 const int NIMAGES = 4;
-const string dir = "/media/colin/DATA/IR_Data/blob_sculpture1/images/clahe/descriptors/";
-const string desc1 = "1676148658926000118_desc.npy";
-const string desc2 = "1676148666526000023_desc.npy";
-const string desc3 = "1676148670426000118_desc.npy";
-const string desc4 = "1676148683059000015_desc.npy";
+const string dir = "/media/colin/box_data/ir_data/nuance_data/kri_day_2/cam_3/matlab_clahe2/gluestick/descriptors/";
+const string desc1 = "1689804908509000063.npy";
+const string desc2 = "1689804948243000031.npy";
+const string desc3 = "1689804981443000078.npy";
+const string desc4 = "1689805056710999966.npy";
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -144,39 +144,42 @@ void testVocCreation(const vector<vector<vector<float>>> &features)
   // lets do something with this vocabulary
   cout << "Matching images against themselves (0 low, 1 high): " << endl;
   BowVector v1, v2;
+  FeatureVector featureVec; 
   for(int i = 0; i < NIMAGES; i++)
   {
     voc.transform(features[i], v1);
     for(int j = 0; j < NIMAGES; j++)
     {
-      voc.transform(features[j], v2);
-      
+      voc.transform(features[j], v2, featureVec, 1);
+      cout << "feature vec: " << featureVec << endl;
+      cout << endl << "words: " << v2 << endl; 
       double score = voc.score(v1, v2);
+      // cout << "Vec1:" << v1 << " Vec2:" << v2 << endl;
       cout << "Image " << i << " vs Image " << j << ": " << score << endl;
     }
   }
 
-  // save the vocabulary to disk
-  cout << endl << "Saving vocabulary..." << endl;
-  voc.save("small_voc2.yml.gz");
-  cout << "Done" << endl;
+  // // save the vocabulary to disk
+  // cout << endl << "Saving vocabulary..." << endl;
+  // voc.save("small_voc2.yml.gz");
+  // cout << "Done" << endl;
 
-  voc.load("small_voc2.yml.gz");
-  // lets do something with this vocabulary
-  cout << "Matching images against themselves (0 low, 1 high): " << endl;
-  // BowVector v1, v2;
-  for (int i = 0; i < NIMAGES; i++)
-  {
-    voc.transform(features[i], v1);
-    for (int j = 0; j < NIMAGES; j++)
-    {
-      voc.transform(features[j], v2);
+  // voc.load("small_voc2.yml.gz");
+  // // lets do something with this vocabulary
+  // cout << "Matching images against themselves (0 low, 1 high): " << endl;
+  // // BowVector v1, v2;
+  // for (int i = 0; i < NIMAGES; i++)
+  // {
+  //   voc.transform(features[i], v1);
+  //   for (int j = 0; j < NIMAGES; j++)
+  //   {
+  //     voc.transform(features[j], v2);
 
-      double score = voc.score(v1, v2);
-      cout << "Vec1:" << v1 << " Vec2:" << v2 << endl;
-      cout << "Image " << i << " vs Image " << j << ": " << score << endl;
-    }
-  }
+  //     double score = voc.score(v1, v2);
+  //     cout << "Vec1:" << v1 << " Vec2:" << v2 << endl;
+  //     cout << "Image " << i << " vs Image " << j << ": " << score << endl;
+  //   }
+  // }
 }
 
 // ----------------------------------------------------------------------------
@@ -188,7 +191,7 @@ void testDatabase(const vector<vector<vector<float>>> &features)
   // load the vocabulary from disk
   IRVocabulary2 voc("small_voc2.yml.gz");
   
-  IRDatabase2 db(voc, false, 0); // false = do not use direct index
+  IRDatabase2 db(voc, true, 1); // false = do not use direct index
   // (so ignore the last param)
   // The direct index is useful if we want to retrieve the features that 
   // belong to some vocabulary node.
@@ -214,7 +217,8 @@ void testDatabase(const vector<vector<vector<float>>> &features)
 
     // ret[0] is always the same image in this case, because we added it to the 
     // database. ret[1] is the second best match.
-
+    cout << ret[0].Id << endl;
+    cout << ret[0].nWords << endl;
     cout << "Searching for Image " << i << ". " << ret << endl;
   }
 
