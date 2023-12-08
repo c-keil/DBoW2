@@ -59,6 +59,7 @@ set(DEPENDENCY_INSTALL_DIR ${DEPENDENCY_DIR}/install)
 # endif(DEFINED ENV{OPENCV_INSTALL_DIR})
 
 # find_package(OpenCV REQUIRED)
+# find_package(OpenCV 4.4 REQUIRED)
 find_package(OpenCV 3.4 REQUIRED PATHS /home/colin/Software/opencv-3.4.16/build/install)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
@@ -88,6 +89,14 @@ if(BUILD_Demo)
   # file(COPY demo/images DESTINATION ${CMAKE_BINARY_DIR}/)
   endif(BUILD_Demo)
 #IR experiment
+add_executable(ir_timing_exp scripts/ir_timing_exp.cpp)
+target_link_libraries(ir_timing_exp ${PROJECT_NAME} ${OpenCV_LIBS} ${LIBCNPY})
+set_target_properties(ir_timing_exp PROPERTIES CXX_STANDARD 11)
+
+add_executable(ir_debug demo/ir_debug.cpp)
+target_link_libraries(ir_debug ${PROJECT_NAME} ${OpenCV_LIBS} ${LIBCNPY})
+set_target_properties(ir_debug PROPERTIES CXX_STANDARD 11)
+
 add_executable(build_ir_voc scripts/build_ir_voc.cpp)
 target_link_libraries(build_ir_voc ${PROJECT_NAME} ${OpenCV_LIBS} ${LIBCNPY})
 set_target_properties(build_ir_voc PROPERTIES CXX_STANDARD 11)

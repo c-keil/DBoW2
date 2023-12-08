@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <boost/timer.hpp>
 
 // DBoW2
 #include "DBoW2.h" // defines IRFeatures
@@ -48,7 +49,9 @@ int main(int argc, char **argv)
     vector<string> querry_file_names;
     vector<string> descriptor_file_names;
     // getDescFileNames(desc_index_file1, fileNames1);
+    cout << "reading files from:" << endl << desc_index_file << endl;
     getDescFileNames(desc_index_file, descriptor_file_names);
+    cout << "reading files from:" << endl << querry_index_file << endl;
     getDescFileNames(querry_index_file, querry_file_names);
 
     vector<vector<vector<float>>> features;
@@ -56,12 +59,22 @@ int main(int argc, char **argv)
 
     // loadFeatures(fileNames1, features1);
 
+    boost::timer timer;
+    cout << "loading feature set 1..." << endl;
     loadFeatures(querry_file_names, features);
+    cout << "features loaded in " << timer.elapsed() << " seconds" << endl;
+
+    cout << "loading feature set 2..." << endl;
+    timer.restart();
     loadFeatures(descriptor_file_names, features2);
+    cout << "features loaded in " << timer.elapsed() << " seconds" << endl;
     // readFeatures(desc_file_name, features, 300);
 
     //test vacabulary
+    cout << "running voc test..." << endl;
+    timer.restart();
     testVoc(features, features2, voc_file, out_file, n_results);
+    cout << "total db experiment took " << timer.elapsed() << " seconds" << endl;
     // testVoc(features, features2, voc_file, out_file, desc_index_file);
 
     //write results to file
@@ -82,10 +95,10 @@ void readFeatures(const string &fname, vector<vector<float>> &features, const ui
 
 void loadFeatures(const vector<string> &fnames, vector<vector<vector<float>>> &features)
 {
-    uint lim = 300;
+    uint lim = 1000;
     for (string fname : fnames)
     {
-        cout << "processing file " << fname << endl;
+        // cout << "processing file " << fname << endl;
         vector<vector<float>> descriptors;
         readFeatures(fname, descriptors, lim); 
         features.push_back(descriptors);
@@ -132,8 +145,11 @@ void testVoc(vector<vector<vector<float>>> &features, vector<vector<vector<float
 
     // load vocabulary
     cout << "reading in voc file : " << voc_file << endl;
+    boost::timer timer;
     IRVocabulary2 voc(voc_file);
+    cout << "voc read from disk in " << timer.elapsed() << " seconds" << endl;
     cout << "voc : " << voc << endl;
+    
     // IRDatabase2 db(voc, false, 0);
     IRDatabase2 db(voc, true, 1);
     //add features to db
@@ -143,6 +159,8 @@ void testVoc(vector<vector<vector<float>>> &features, vector<vector<vector<float
     // cout << "v2" << endl;
     // cout << v2 << endl;
 
+    cout << "Adding images features to database" << endl;
+    timer.restart();
     for (uint i = 0; i < features2.size(); i++)
     {
         // cout << "loading features " << i << endl;
@@ -151,16 +169,19 @@ void testVoc(vector<vector<vector<float>>> &features, vector<vector<vector<float
         // cout << "Vector : " << v1 << endl;
         db.add(features2[i]);
     }
+    cout << "Building database with " << features2.size() << " took " << timer.elapsed() << " seconds" << endl;
     // cout << "Database information: " << endl << db << endl;
     // cout << "Testing feature set 2 against feature set 1" << endl;
 
     ofstream file;
     // file << db_file << "\n" << test_file <<  "\n"; 
 
-    cout << "Searching for image " << endl;
+    // cout << "Searching for image " << endl;
     // cout << res << endl;
     QueryResults res;
     // db.query(features, res, n_results);
+    cout << "querrying db.." << endl;
+    timer.restart();
     for (uint i = 0; i < features.size(); i++)
     {
         db.query(features[i], res, n_results);
@@ -178,6 +199,7 @@ void testVoc(vector<vector<vector<float>>> &features, vector<vector<vector<float
         file.close();
 
     }
+    cout << "searching for " << features.size() << " images in db with " << features2.size() << " images took " << timer.elapsed() << " seconds." << endl;
 
     // file << res << "\n";
 
