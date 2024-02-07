@@ -58,9 +58,9 @@ set(DEPENDENCY_INSTALL_DIR ${DEPENDENCY_DIR}/install)
 #     find_package(OpenCV REQUIRED)
 # endif(DEFINED ENV{OPENCV_INSTALL_DIR})
 
-# find_package(OpenCV REQUIRED)
+find_package(OpenCV REQUIRED)
 # find_package(OpenCV 4.4 REQUIRED)
-find_package(OpenCV 3.4 REQUIRED PATHS /home/colin/Software/opencv-3.4.16/build/install)
+# find_package(OpenCV 3.4 REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 if(BUILD_DBoW2)
