@@ -45,6 +45,7 @@ void wait()
 
 int main()
 {
+  cout << "IR DEMO" << endl;
   vector<vector<cv::Mat > > features;
   loadFeatures(features);
 
@@ -177,6 +178,53 @@ void testVocCreation(const vector<vector<cv::Mat>> &features)
       cout << "Image " << i << " vs Image " << j << ": " << score << endl;
     }
   }
+
+  //compare against FIR2
+  IRVocabulary2 voc2;
+  voc2.load("small_voc.yml.gz");
+  cout << "Voc2" << endl;
+  cout << voc2 << endl;
+
+  vector<vector<vector<float>>> vec_features;
+  vec_features.clear();
+  vec_features.resize(NIMAGES);
+  for (size_t im = 0; im < features.size(); im++)
+  {
+    // auto im_features = vec_features[im];
+    cout << "converting features " << im << endl;
+    // vector<vector<float>> image_features = vec_features[im];
+    // auto image_features = vec_features[im];
+    // cout << "??" << endl;  
+    // image_features.clear();
+    for (auto im_feature : features[im])
+    {
+      // cout << "im_feature size" << im_feature.size() << endl;
+      vector<float> feature;
+      for (int i = 0; i < 256; i++ )
+      {
+        // cout << i << endl;
+        float d = im_feature.at<float>(i);
+        feature.push_back(d);
+      }
+      // cout << "here" << endl;
+      vec_features[im].push_back(feature);
+    } 
+    // vec_features.push_back(feature);
+  }
+
+  for (int i = 0; i < NIMAGES; i++)
+  {
+    voc2.transform(vec_features[i], v1);
+    for (int j = 0; j < NIMAGES; j++)
+    {
+      voc2.transform(vec_features[j], v2);
+
+      double score = voc2.score(v1, v2);
+      cout << "Vec1:" << v1 << " Vec2:" << v2 << endl;
+      cout << "Image " << i << " vs Image " << j << ": " << score << endl;
+    }
+  }
+
 }
 
 // ----------------------------------------------------------------------------

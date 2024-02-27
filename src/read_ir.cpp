@@ -38,6 +38,19 @@ void readDescNPY(std::string const &data_fname, std::vector<std::vector<float>> 
     }
 }
 
+void readDescNPY(std::string const &data_fname, std::vector<cv::Mat> &out)
+{
+    cv::Mat out_mat;
+    readDescNPY(data_fname, out_mat);
+    out.clear();
+    out.resize(out_mat.rows);
+
+    for (uint i = 0; i<out_mat.rows; i++)
+    {
+        out[i] = out_mat.row(i);
+    }
+}
+
 // void readKpNPY(std::string const &data_fname, std::vector<cv::KeyPoint> &keypoints)
 // {
 //     cnpy::NpyArray npy_data = cnpy::npy_load(data_fname);

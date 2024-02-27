@@ -10,6 +10,8 @@
 #ifndef __D_T_TEMPLATED_VOCABULARY__
 #define __D_T_TEMPLATED_VOCABULARY__
 
+// #include <stdio>
+
 #include <cassert>
 #include <cstdlib>
 #include <vector>
@@ -222,6 +224,19 @@ public:
    */
   void setScoringType(ScoringType type);
   
+  //ADDED
+    /**
+   * Loads the vocabulary from a text file
+   * @param filename
+   */
+    bool loadFromTextFile(const std::string &filename);
+
+    /**
+     * Saves the vocabulary into a text file
+     * @param filename
+     */
+    void saveToTextFile(const std::string &filename) const;
+
   /**
    * Saves the vocabulary into a file
    * @param filename
@@ -454,6 +469,124 @@ TemplatedVocabulary<TDescriptor,F>::TemplatedVocabulary
 {
   load(filename);
 }
+
+// --------------------------------------------------------------------------
+    template<class TDescriptor, class F>
+    bool TemplatedVocabulary<TDescriptor,F>::loadFromTextFile(const std::string &filename)
+    {
+        std::ifstream f;
+        f.open(filename.c_str());
+
+        if(f.eof())
+            return false;
+
+        m_words.clear();
+        m_nodes.clear();
+
+        std::string s;
+        getline(f,s);
+        std::stringstream ss;
+        ss << s;
+        ss >> m_k;
+        ss >> m_L;
+        int n1, n2;
+        ss >> n1;
+        ss >> n2;
+
+        if(m_k<0 || m_k>20 || m_L<1 || m_L>10 || n1<0 || n1>5 || n2<0 || n2>3)
+        {
+            std::cerr << "Vocabulary loading failure: This is not a correct text file!" << std::endl;
+            return false;
+        }
+
+        m_scoring = (ScoringType)n1;
+        m_weighting = (WeightingType)n2;
+        createScoringObject();
+
+        // nodes
+        int expected_nodes =
+                (int)((pow((double)m_k, (double)m_L + 1) - 1)/(m_k - 1));
+        m_nodes.reserve(expected_nodes);
+
+        m_words.reserve(pow((double)m_k, (double)m_L + 1));
+
+        m_nodes.resize(1);
+        m_nodes[0].id = 0;
+        while(!f.eof())
+        {
+            std::string snode;
+            getline(f,snode);
+            std::stringstream ssnode;
+            ssnode << snode;
+
+            int nid = m_nodes.size();
+            m_nodes.resize(m_nodes.size()+1);
+            m_nodes[nid].id = nid;
+
+            int pid ;
+            ssnode >> pid;
+            m_nodes[nid].parent = pid;
+            m_nodes[pid].children.push_back(nid);
+
+            int nIsLeaf;
+            ssnode >> nIsLeaf;
+
+            std::stringstream ssd;
+            for(int iD=0;iD<F::L;iD++)
+            {
+                std::string sElement;
+                ssnode >> sElement;
+                ssd << sElement << " ";
+            }
+            F::fromString(m_nodes[nid].descriptor, ssd.str());
+
+            ssnode >> m_nodes[nid].weight;
+
+            if(nIsLeaf>0)
+            {
+                int wid = m_words.size();
+                m_words.resize(wid+1);
+
+                m_nodes[nid].word_id = wid;
+                m_words[wid] = &m_nodes[nid];
+            }
+            else
+            {
+                m_nodes[nid].children.reserve(m_k);
+            }
+        }
+
+        return true;
+
+    }
+
+// --------------------------------------------------------------------------
+
+    template<class TDescriptor, class F>
+    void TemplatedVocabulary<TDescriptor,F>::saveToTextFile(const std::string &filename) const
+    {
+        std::fstream f;
+        f.open(filename.c_str(),std::ios_base::out);
+        f << m_k << " " << m_L << " " << " " << m_scoring << " " << m_weighting << std::endl;
+
+        for(size_t i=1; i<m_nodes.size();i++)
+        {
+            const Node& node = m_nodes[i];
+
+            f << node.parent << " ";
+            if(node.isLeaf())
+                f << 1 << " ";
+            else
+                f << 0 << " ";
+
+            f << F::toString(node.descriptor) << " " << (double)node.weight << std::endl;
+        }
+
+        f.close();
+    }
+
+// --------------------------------------------------------------------------
+
 
 // --------------------------------------------------------------------------
 
@@ -1345,9 +1478,12 @@ void TemplatedVocabulary<TDescriptor,F>::save(const std::string &filename) const
 
 template<class TDescriptor, class F>
 void TemplatedVocabulary<TDescriptor,F>::load(const std::string &filename)
-{
+{ 
+  std::cout << "TemplatedVocabulary::load -- initializing cv::FileStorage : " << filename.c_str() << std::endl;
   cv::FileStorage fs(filename.c_str(), cv::FileStorage::READ);
-  if(!fs.isOpened()) throw std::string("Could not open file ") + filename;
+  std::cout << "TemplatedVocabulary::load -- initialized cv::FileStorage" << std::endl;
+  if(!fs.isOpened()) throw std::string("Could not open file ") + filename; //somehow this is causing the problem
+  std::cout << "TemplatedVocabulary::load -- initializing calling load(fs)" << std::endl;
   
   this->load(fs);
 }
@@ -1454,10 +1590,12 @@ void TemplatedVocabulary<TDescriptor,F>::save(cv::FileStorage &f,
 template<class TDescriptor, class F>
 void TemplatedVocabulary<TDescriptor,F>::load(const cv::FileStorage &fs,
   const std::string &name)
-{
+{ 
+  std::cout << "TemplatedVocabulary.load--loading vocabulary..." << std::endl;
   m_words.clear();
   m_nodes.clear();
   
+  std::cout << "TemplatedVocabulary.load--init filenode..." << std::endl;
   cv::FileNode fvoc = fs[name];
   
   m_k = (int)fvoc["k"];
@@ -1465,14 +1603,17 @@ void TemplatedVocabulary<TDescriptor,F>::load(const cv::FileStorage &fs,
   m_scoring = (ScoringType)((int)fvoc["scoringType"]);
   m_weighting = (WeightingType)((int)fvoc["weightingType"]);
   
+  std::cout << "TemplatedVocabulary.load-- creating scoring object" << std::endl;
   createScoringObject();
 
   // nodes
+  std::cout << "TemplatedVocabulary.load--getting number of nodes" << std::endl;
   cv::FileNode fn = fvoc["nodes"];
 
   m_nodes.resize(fn.size() + 1); // +1 to include root
   m_nodes[0].id = 0;
 
+  std::cout << "TemplatedVocabulary.load--reading nodes" << std::endl;
   for(unsigned int i = 0; i < fn.size(); ++i)
   {
     NodeId nid = (int)fn[i]["nodeId"];
@@ -1488,6 +1629,7 @@ void TemplatedVocabulary<TDescriptor,F>::load(const cv::FileStorage &fs,
     F::fromString(m_nodes[nid].descriptor, d);
   }
   
+  std::cout << "TemplatedVocabulary.load--reading words" << std::endl;
   // words
   fn = fvoc["words"];
   
