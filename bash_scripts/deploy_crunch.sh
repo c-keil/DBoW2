@@ -1,0 +1,1 @@
+rsync -avm --exclude="vocs/*" --exclude="build/*" --exclude="tmp/*" --exclude=".*" /home/colin/Research/ir/DBoW2 crunch:/home/auv/colin/
