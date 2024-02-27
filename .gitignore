@@ -2,3 +2,4 @@ build/*
 tmp/*
 vocs/*
 .vscode/*
+*.pyc
